@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from getStatus.views import index
+from getStatus.views import index, getDeliveryStatus
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', index, name = 'index'),
+    url(r'^getDeliveryStatus/', getDeliveryStatus, name = 'getDeliveryStatus')
 ]

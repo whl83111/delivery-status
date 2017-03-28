@@ -11,12 +11,7 @@
          background: url({% static 'airport-05.jpg' %});
      }
 	</style>
-	<script type="text/javascript">
-		function getStatus() {
-			var deliveryId = document.getElementById('deliveryId').value;
-			alert(deliveryId)
-		}
-	</script>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 </head>
 <body class="container grayscale">
 	<div class="ts heading slate">
@@ -25,13 +20,14 @@
 	</div>
 	<div class="ts centered narrow container" style="padding-top: 30px;padding-bottom: 20px;">
 		<div class="ts action fluid input">
+		{% csrf_token %}
 		    <input type="text" id="deliveryId" placeholder="輸入單號">
-		    <button class="ts button" onclick="getStatus()">查詢</button>
+		    <button class="ts button" onclick="makeRequest({% url 'getDeliveryStatus' %})">查詢</button>
 		</div>
 		
 		
-	<!-- </div>
-	<div class="ts raised card narrow container" style="padding: 30px;">
+	</div>
+	<div class="ts raised card narrow container" style="padding: 30px; display: none;">
 		    <div class="content">
 		        <h1 class="ts header">東風貨運</h1>
 		        <div class="description">
@@ -111,7 +107,7 @@
 		        </tbody>
 		    </table>
 	</div>
-	<div class="ts raised card narrow container" style="padding: 30px;">
+	<div class="ts raised card narrow container" style="padding: 30px; display: none;">
 		    <div class="content">
 		        <h1 class="ts header">黑貓宅急便</h1>
 		        <div class="description">
@@ -149,6 +145,6 @@
 		        </tbody>
 		    </table>
 	</div>
- -->
+
 </body>
 </html>
