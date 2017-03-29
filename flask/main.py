@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, request
-from getDeliveryData import getBlackCat
+from getDeliveryData import getDongPoo, getBlackCat
 import json
 
 class CustomFlask(Flask):
@@ -21,9 +21,11 @@ def index():
 
 @app.route('/getData/', methods = ['POST'])
 def getData():
-    print(request)
     if not request.json or not 'deliveryId' in request.json:
         abort(400)
-    deliveryId = request.json
-    print(deliveryId)
-    return jsonify(deliveryId)
+    else:
+    	deliveryId = request.json['deliveryId']
+    	print(deliveryId)
+    	DongPoo = getDongPoo(deliveryId)
+    	BlackCat = getBlackCat(deliveryId)
+    	return jsonify(deliveryId = deliveryId, DongPoo = DongPoo, BlackCat = BlackCat)
