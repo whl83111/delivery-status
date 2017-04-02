@@ -4,9 +4,8 @@
 	<title>貨運查詢</title>
 	<!-- link rel="stylesheet" href="tocas.min.css"-->
 	<link rel="stylesheet" href="https://cdn.rawgit.com/TeaMeow/TocasUI/master/dist/tocas.min.css">
-	<link rel="stylesheet" href=$url_for('static', filename='main.css')$>
+	<link rel="stylesheet" href="$url_for('static', filename='main.css')$">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	</style>
 	<script src="https://unpkg.com/axios/dist/axios.js"></script>
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 </head>
@@ -20,13 +19,12 @@
 		    <input type="text" v-model="deliveryId" placeholder="輸入單號">
 		    <button class="ts button" v-on:click="getData">查詢</button>
 		</div>
-		
 	</div>
-	<div class="ts raised card narrow container myPadding" id="DongPoo" v-bind:style="{ display : showIt }">
+	<div class="ts raised card narrow container myPadding" id="DongPoo" v-bind:style="{ visibility : visibility }">
 		    <div class="content">
 		        <h1 class="ts header">東風貨運</h1>
 		        <div class="description">
-		            <p>單號 : 900032521962</p>
+		            <p>單號 : {{ deliveryId }}</p>
 		        </div>
 		    </div>
 		    <table class="ts celled structured table">

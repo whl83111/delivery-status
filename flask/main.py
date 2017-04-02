@@ -15,6 +15,12 @@ class CustomFlask(Flask):
 
 app = CustomFlask(__name__)
 
+app.config.update(
+    DEBUG = True,
+    TEMPLATES_AUTO_RELOAD = True,
+	SEND_FILE_MAX_AGE_DEFAULT = 1,
+)
+
 @app.route('/')
 def index():
     return render_template('index.html')

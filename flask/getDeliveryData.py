@@ -10,7 +10,7 @@ def getDongPoo(deliveryId):
 	postData = {'trackNo' : deliveryId}
 	response = rq.post(link, data = postData)
 	targetData = {}
-	try:
+	if response.json() != []:
 		temp = response.json()[0]
 		link2 = 'http://220.135.157.10:8088/goods_queryGoodsStatus'
 		response2 = rq.post(link2, data = postData)
@@ -30,8 +30,9 @@ def getDongPoo(deliveryId):
 				'remark' : data['remark'] # 貨況
 			}
 			targetData['details'].append(data_temp)
-	except:
-		targetData['error'] = True
+		targetData['expired'] = False
+	else:
+		targetData['expired'] = True
 	return targetData
 
 def getBlackCat(deliveryId):
@@ -53,7 +54,7 @@ def getBlackCat(deliveryId):
 		    })
 	except:
 		targetData['error'] = True
-	if targetData == []:
+	if targetData['rows'] == []:
 		targetData['expired'] = True
 	else:
 		targetData['expired'] = False
