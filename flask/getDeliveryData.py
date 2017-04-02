@@ -1,6 +1,7 @@
 import requests as rq
 from bs4 import BeautifulSoup as bs
 import json
+import datetime
 
 def checkDeliveryIdForm(deliveryId):
 	return True
@@ -16,9 +17,10 @@ def getDongPoo(deliveryId):
 		response2 = rq.post(link2, data = postData)
 		temp2 = response2.json()
 		targetData = {
+			'deliveryId' : deliveryId,
 			'handleDate' : temp['handleDate'], # 送達日期
 			'consigneeName' : temp['consigneeName'], # 收件人
-			'bookingDate' : temp['bookingDate'], # 資料日期
+			'bookingDate' : datetime.datetime.strptime(temp['bookingDate'], '%Y%m%d').strftime('%Y/%m/%d'), # 資料日期
 			'realCcPrice' : temp['realCcPrice'], # 代收款
 		}
 		targetData['details'] = []

@@ -21,48 +21,60 @@
 		</div>
 	</div>
 	<div class="ts raised card narrow container myPadding" id="DongPoo" v-bind:style="{ visibility : visibility }">
-		    <div class="content">
-		        <h1 class="ts header">東風貨運</h1>
-		        <div class="description">
-		            <p>單號 : {{ deliveryId }}</p>
-		        </div>
-		    </div>
-		    <table class="ts celled structured table">
-		        <thead>
-		            <tr>
-		                <th>資料日期</th>
-		                <th>到件日期</th>
-		                <th>收件人</th>
-		                <th>代收款</th>
-		            </tr>
-		        </thead>
-		        <tbody>
-		            <tr>
-		                <td>2016/12/26</td>
-		                <td>2016/12/27</td>
-		                <td>林＊龍</td>
-		                <td>0</td>
-		            </tr>
-		        </tbody>
-		    </table>
-		    <table class="ts celled selectable table">
-		        <thead>
-		            <tr>
-		                <th>#</th>
-		                <th>日期</th>
-		                <th>時間</th>
-		                <th>貨況</th>
-		            </tr>
-		        </thead>
-		        <tbody>
-		            <tr class="positive">
-		                <td>1</td>
-		                <td>2016/12/28</td>
-		                <td>16:07:20</td>
-		                <td>配完</td>
-		            </tr>
-		        </tbody>
-		    </table>
+	<!-- 考慮用 v-show="show" -->
+		<div class="content">
+			<h1 class="ts header">東風貨運</h1>
+			<div class="description">
+				<p>單號 : {{ deliveryId }}</p>
+				<p v-bind:style="{ display : messengeDisplay }">{{ messenge }}</p>
+			</div>
+		</div>
+		<table class="ts celled structured table">
+			<thead>
+				<tr>
+					<th>資料日期</th>
+					<th>到件日期</th>
+					<th>收件人</th>
+					<th>代收款</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ bookingDate }}</td>
+					<td>{{ handleDate }}</td>
+					<td>{{ consigneeName }}</td>
+					<td>{{ realCcPrice }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="ts celled selectable table">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>日期</th>
+					<th>時間</th>
+					<th>貨況</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="row in rows" v-if="row.remark == '配完'" class="positive">
+					<td>{{ row.rowNum }}</td>
+					<td>{{ row.handleDate }}</td>
+					<td>{{ row.handleTime }}</td>
+					<td>{{ row.remark }}</td>
+				</tr>
+				<tr v-for="row in rows" v-if="row.remark != '配完'">
+					<td>{{ row.rowNum }}</td>
+					<td>{{ row.handleDate }}</td>
+					<td>{{ row.handleTime }}</td>
+					<td>{{ row.remark }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="ts dimmer" v-bind:class="{ active : loding , disable : !loding}">
+        	<div class="ts text massive loader">讀取中</div>
+		</div>
+    </div>
 	</div>
 	<div class="ts raised card narrow container myPadding" style="display: none;">
 		    <div class="content">
