@@ -1,7 +1,7 @@
 var input = new Vue({
 	el: '#input',
 	data: {
-		deliveryId: 900032521962
+		deliveryId: null
 	},
 	methods: {
 		getData: function () {
