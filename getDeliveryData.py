@@ -52,6 +52,7 @@ def getBlackCat(deliveryId):
 			if i == 1:
 				j += 1
 			targetData['rows'].append({
+				'nowNum' : i,
 				'status' : rows[i].select('td')[j].text.strip(),
 				'time' : rows[i].select('td')[j + 1].text.strip(),
 				'location' : rows[i].select('td')[j + 2].text.strip()
