@@ -103,12 +103,6 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="positive">
-							<td>1</td>
-							<td>順利送達</td>
-							<td>2016/12/28 16:07</td>
-							<td>湖口營業所</td>
-						</tr>
 						<tr v-for="row in rows" v-if="row.remark == '順利送達'" class="positive">
 							<td>{{ row.rowNum }}</td>
 							<td>{{ row.status }}</td>
