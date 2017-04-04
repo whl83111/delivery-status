@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import requests as rq
 from bs4 import BeautifulSoup as bs
 import json
@@ -34,26 +35,27 @@ def getDongPoo(deliveryId):
 			targetData['details'].append(data_temp)
 		targetData['expired'] = False
 	else:
+		targetData['deliveryId'] = deliveryId
 		targetData['expired'] = True
 	return targetData
 
 def getBlackCat(deliveryId):
 	link = 'https://www.t-cat.com.tw/Inquire/TraceDetail.aspx?BillID={}&ReturnUrl=Trace.aspx'.format(deliveryId)
 	response = rq.get(link)
-	print(link)
+	# print(link)
 	soup = bs(response.text, 'lxml')
-	targetData = {'rows' : []}
+	targetData = {'rows' : [], 'deliveryId' : deliveryId}
 	try:
 		rows = soup.select('table.tablelist')[0].select('tr')
 		for i in range(1, len(rows)):
-		    j = 0
-		    if i == 1:
-		        j += 1
-		    targetData['rows'].append({
-		    	'status' : rows[i].select('td')[j].text.strip(),
-		    	'time' : rows[i].select('td')[j + 1].text.strip(),
-		    	'location' : rows[i].select('td')[j + 2].text.strip()
-		    })
+			j = 0
+			if i == 1:
+				j += 1
+			targetData['rows'].append({
+				'status' : rows[i].select('td')[j].text.strip(),
+				'time' : rows[i].select('td')[j + 1].text.strip(),
+				'location' : rows[i].select('td')[j + 2].text.strip()
+			})
 	except:
 		targetData['error'] = True
 	if targetData['rows'] == []:

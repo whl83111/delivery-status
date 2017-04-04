@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html data-ts-native>
+
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>貨運查詢</title>
 	<!-- link rel="stylesheet" href="tocas.min.css"-->
 	<link rel="stylesheet" href="https://cdn.rawgit.com/TeaMeow/TocasUI/master/dist/tocas.min.css">
@@ -9,100 +11,125 @@
 	<script src="https://unpkg.com/axios/dist/axios.js"></script>
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 </head>
-<body class="container grayscale">
+
+<body class="grayscale">
 	<div class="ts heading slate">
-    	<span class="header">貨運查詢</span>
-    	<span class="description">全台最大線上查貨平台上線啦!</span>
+		<span class="header">貨運查詢</span>
+		<span class="description">全台最大線上查貨平台上線啦!</span>
 	</div>
-	<div class="ts centered narrow container" style="padding-top: 30px;padding-bottom: 20px;">
-		<div class="ts action fluid input" id="input">
-		    <input type="text" v-model="deliveryId" placeholder="輸入單號">
-		    <button class="ts button" v-on:click="getData">查詢</button>
-		</div>
-	</div>
-	<div class="ts raised card narrow container myPadding" id="DongPoo" v-bind:style="{ visibility : visibility }">
-	<!-- 考慮用 v-show="show" -->
-		<div class="content">
-			<h1 class="ts header">東風貨運</h1>
-			<div class="description">
-				<p>單號 : {{ deliveryId }}</p>
-				<p v-bind:style="{ display : messengeDisplay }">{{ messenge }}</p>
+	<div class="ts centered narrow container">
+		<div class="ts centered" style="padding-top: 30px;padding-bottom: 20px;">
+			<div class="ts action fluid input" id="input">
+				<input type="text" v-model="deliveryId" placeholder="輸入單號">
+				<button class="ts button" v-on:click="getData">查詢</button>
 			</div>
 		</div>
-		<table class="ts celled structured table">
-			<thead>
-				<tr>
-					<th>資料日期</th>
-					<th>到件日期</th>
-					<th>收件人</th>
-					<th>代收款</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>{{ bookingDate }}</td>
-					<td>{{ handleDate }}</td>
-					<td>{{ consigneeName }}</td>
-					<td>{{ realCcPrice }}</td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="ts celled selectable table">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>日期</th>
-					<th>時間</th>
-					<th>貨況</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="row in rows" v-if="row.remark == '配完'" class="positive">
-					<td>{{ row.rowNum }}</td>
-					<td>{{ row.handleDate }}</td>
-					<td>{{ row.handleTime }}</td>
-					<td>{{ row.remark }}</td>
-				</tr>
-				<tr v-for="row in rows" v-if="row.remark != '配完'">
-					<td>{{ row.rowNum }}</td>
-					<td>{{ row.handleDate }}</td>
-					<td>{{ row.handleTime }}</td>
-					<td>{{ row.remark }}</td>
-				</tr>
-			</tbody>
-		</table>
-		<div class="ts dimmer" v-bind:class="{ active : loding , disable : !loding}">
-        	<div class="ts text massive loader">讀取中</div>
+		<div class="ts primary segment">
+			<p>目前支援東風貨運、黑貓宅急便。</p>
 		</div>
-    </div>
+		<div class="ts raised card myPadding" id="DongPoo" v-bind:style="{ visibility : visibility }">
+			<!-- 考慮用 v-show="show" -->
+			<div class="content">
+				<h1 class="ts header">東風貨運</h1>
+				<div class="description">
+					<p>單號 : {{ deliveryId }}</p>
+				</div>
+			</div>
+			<message v-if="!displayTable" :message="message"></message>
+			<template v-if="displayTable">
+				<table class="ts celled structured table">
+					<thead>
+						<tr>
+							<th>資料日期</th>
+							<th>到件日期</th>
+							<th>收件人</th>
+							<th>代收款</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{{ bookingDate }}</td>
+							<td>{{ handleDate }}</td>
+							<td>{{ consigneeName }}</td>
+							<td>{{ realCcPrice }}</td>
+						</tr>
+					</tbody>
+				</table>
+				<table class="ts celled selectable table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>日期</th>
+							<th>時間</th>
+							<th>貨況</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="row in rows" v-if="row.remark == '配完'" class="positive">
+							<td>{{ row.rowNum }}</td>
+							<td>{{ row.handleDate }}</td>
+							<td>{{ row.handleTime }}</td>
+							<td>{{ row.remark }}</td>
+						</tr>
+						<tr v-for="row in rows" v-if="row.remark != '配完'">
+							<td>{{ row.rowNum }}</td>
+							<td>{{ row.handleDate }}</td>
+							<td>{{ row.handleTime }}</td>
+							<td>{{ row.remark }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</template>
+			<div class="ts dimmer" v-bind:class="{ active : loding , disable : !loding}">
+				<div class="ts text massive loader">讀取中</div>
+			</div>
+		</div>
+		<div class="ts raised card myPadding" id="BlackCat" v-bind:style="{ visibility : visibility }">
+			<div class="content">
+				<h1 class="ts header">黑貓宅急便</h1>
+				<div class="description">
+					<p>單號 : {{ deliveryId }}</p>
+				</div>
+			</div>
+			<message v-if="!displayTable" :message="message"></message>
+			<template v-if="displayTable">
+				<table class="ts celled selectable table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>目前狀態</th>
+							<th>資料登入時間</th>
+							<th>負責營業所</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="positive">
+							<td>1</td>
+							<td>順利送達</td>
+							<td>2016/12/28 16:07</td>
+							<td>湖口營業所</td>
+						</tr>
+						<tr v-for="row in rows" v-if="row.remark == '順利送達'" class="positive">
+							<td>{{ row.rowNum }}</td>
+							<td>{{ row.status }}</td>
+							<td>{{ row.time }}</td>
+							<td>{{ row.location }}</td>
+						</tr>
+						<tr v-for="row in rows" v-if="row.remark != '順利送達'">
+							<td>{{ row.rowNum }}</td>
+							<td>{{ row.status }}</td>
+							<td>{{ row.time }}</td>
+							<td>{{ row.location }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</template>
+			<div class="ts dimmer" v-bind:class="{ active : loding , disable : !loding}">
+				<div class="ts text massive loader">讀取中</div>
+			</div>
+		</div>
 	</div>
-	<div class="ts raised card narrow container myPadding" style="display: none;">
-		    <div class="content">
-		        <h1 class="ts header">黑貓宅急便</h1>
-		        <div class="description">
-		            <p>單號 : 900032521962</p>
-		        </div>
-		    </div>
-		    <table class="ts celled selectable table">
-		        <thead>
-		            <tr>
-		                <th>#</th>
-		                <th>目前狀態</th>
-		                <th>資料登入時間</th>
-		                <th>負責營業所</th>
-		            </tr>
-		        </thead>
-		        <tbody>
-		            <tr class="positive">
-		                <td>1</td>
-		                <td>順利送達</td>
-		                <td>2016/12/28 16:07</td>
-		                <td>湖口營業所</td>
-		            </tr>
-		        </tbody>
-		    </table>
-	</div>
-	<script type="text/javascript" src=$url_for('static', filename='main.js')$></script>
-
+	<script type="text/javascript" src=$url_for( 'static', filename='main.js' )$></script>
 </body>
+
 </html>
