@@ -4,3 +4,7 @@ entrypoint: python3 main.py
 
 runtime_config:
   python_version: 3
+
+network:
+  forwarded_ports:
+    - 8080/tcp
