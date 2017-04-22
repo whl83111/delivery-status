@@ -1,1 +1,1 @@
-web: gunicorn -b :$PORT main:app
+web: gunicorn gettingstarted.wsgi --log-file -
