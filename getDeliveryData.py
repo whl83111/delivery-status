@@ -4,8 +4,14 @@ from bs4 import BeautifulSoup as bs
 import json
 import datetime
 
-def checkDeliveryIdForm(deliveryId):
-	return True
+#東風
+class DongPoo():
+	def __init__(self, deliveryId):
+		self.deliveryId = deliveryId
+
+	def getResponse(self):
+		pass
+
 
 def getDongPoo(deliveryId):
 	link = 'http://220.135.157.10:8088/goods_status'
@@ -65,7 +71,49 @@ def getBlackCat(deliveryId):
 		targetData['expired'] = False
 	return targetData
 
+
+# 速力達
+SKYLEADEREXPRESS_LINK_TEMPLATE = 'http://www.sldex.com/index_DetailSearchResult.php?ship_no=(%27{}%27)'
+SKYLEADEREXPRESS_ID_LENGTH = 12
+class SkyLeaderExpress():
+	def __init__(self, deliveryId):
+		self.deliveryId = str(deliveryId)
+		self.responseData = {
+			'deliveryId': deliveryId,
+			'data': list()
+		}
+	
+	def deliveryIdLengthIsCorrect(self):
+		if (len(self.deliveryId) == SKYLEADEREXPRESS_ID_LENGTH) and (self.deliveryId.isdigit()):
+			return True
+
+	def getResponse(self):
+		response = rq.get(SKYLEADEREXPRESS_LINK_TEMPLATE.format(self.deliveryId))
+		response.encoding = 'UTF-8'
+		soup = bs(response.text, 'lxml')
+		responseTable = soup.select('div.alert.alert-danger')[0].select('b')
+		responseDeliveryId = responseTable[0].text
+		responseDatas = [data.text.split('·') for data in responseTable[1:]]
+		if responseDeliveryId == self.deliveryId:
+			for data in responseDatas:
+				self.responseData['data'].append({
+					'time': data[0],
+					'status': data[1]
+				})
+
+	def getData(self):
+		try:
+			if self.deliveryIdLengthIsCorrect():
+				self.getResponse()
+		except:
+			pass
+		finally:
+			return self.responseData
+
 if __name__ == '__main__':
-	deliveryId = 900032521962
-	print(getDongPoo(deliveryId))
-	print(getBlackCat(deliveryId))
+	# deliveryId = 900032521962
+	# print(getDongPoo(deliveryId))
+	# print(getBlackCat(deliveryId))
+	slid = 300003938454
+	print(SkyLeaderExpress(slid).getData())
+
