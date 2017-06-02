@@ -34,7 +34,7 @@ def testAPI():
 	return jsonify(deliveryId = deliveryId)
 
 @app.route('/getData/', methods=['POST'])
-def testPOSTMulti():
+def getData():
 	if (not request.json) or (not 'deliveryId' in request.json):
 		abort(400)
 	else:
