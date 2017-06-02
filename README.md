@@ -3,5 +3,4 @@
 [範例](https://delivery-status-flask.herokuapp.com/)
 
 # TODO
-1. 修改背景css
-2. 修改main.js
+1. 新增支援鼎盛貨運
