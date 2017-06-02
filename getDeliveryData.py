@@ -7,7 +7,7 @@ import datetime
 #東風
 DONGPOO_CUSTOMER_DATA_LINK = 'http://220.135.157.10:8088/goods_status'
 DONGPOO_DELIVERY_DETAILS_LINK = 'http://220.135.157.10:8088/goods_queryGoodsStatus'
-DONGPOO_ID_LENGTH = 12
+DONGPOO_ID_LENGTH = (10, 12)
 class DongPoo():
 	def __init__(self, deliveryId):
 		self.deliveryId = str(deliveryId)
@@ -18,7 +18,7 @@ class DongPoo():
 		self.details = list()
 
 	def deliveryIdLengthIsCorrect(self):
-		if (len(self.deliveryId) == DONGPOO_ID_LENGTH) and (self.deliveryId.isdigit()):
+		if (len(self.deliveryId) in DONGPOO_ID_LENGTH) and (self.deliveryId.isdigit()):
 			return True
 	
 	def getCustomerData(self):
@@ -59,14 +59,14 @@ class DongPoo():
 
 # 黑貓
 BLACKCAT_LINK_TEMPLATE = 'https://www.t-cat.com.tw/Inquire/TraceDetail.aspx?BillID={}&ReturnUrl=Trace.aspx'
-BLACKCAT_ID_LENGTH = [10, 12]
+BLACKCAT_ID_LENGTH = 12
 class BlackCat():
 	def __init__(self, deliveryId):
 		self.deliveryId = str(deliveryId)
 		self.responseData = list()
 
 	def deliveryIdLengthIsCorrect(self):
-		if (len(self.deliveryId) in BLACKCAT_ID_LENGTH) and (self.deliveryId.isdigit()):
+		if (len(self.deliveryId) == BLACKCAT_ID_LENGTH) and (self.deliveryId.isdigit()):
 			return True
 
 	def getResponseData(self):
