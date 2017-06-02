@@ -7,19 +7,11 @@ html, body {
   background: url('airport-05.jpg');
   background-attachment: fixed;
   width: 100%;
-  min-height: 100vh;
-}
-
-.myPadding {
-  padding: 30px;
+  min-height: 100%;
 }
 
 #footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  margin-top: 50px;
 }
-
-
-/*background改fixed*/

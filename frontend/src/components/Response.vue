@@ -1,19 +1,38 @@
 <template lang="pug">
-  div {{ response }}
-  DongPoo(:responseData="responseId.dongPoo", v-if="dongPoo != null")
-  BlackCat(:responseData="responseId.blackCat", v-if="blackCat == null")
+  .ts.flatted.card#card
+    .secondary.extra.content
+      .header {{ response.deliveryId }}
+    .content
+      .description
+        DongPoo(:responseData="response.data.dongPoo", v-if="response.data.dongPoo !== null")
+        BlackCat(:responseData="response.data.blackCat", v-if="response.data.blackCat !== null")
+        SkyLeader(:responseData="response.data.skyLeader", v-if="response.data.skyLeader !== null")
+
 </template>
 
 <script>
-import DongPoo from './DongPoo'
-import BlackCat from './BlackCat'
+import DongPoo from './ResponseTable/DongPoo'
+import BlackCat from './ResponseTable/BlackCat'
+import SkyLeader from './ResponseTable/SkyLeader'
+
 export default {
   name: 'response',
-  props: ['responseId'],
+  props: ['response'],
+  components: {
+    DongPoo,
+    BlackCat,
+    SkyLeader
+  },
+  data () {
+    return {
+    }
+  }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+#card {
+  margin-top: 20px;
+  box-shadow: 0px 0px 50px #555555;
+}
 </style>
