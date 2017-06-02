@@ -12,7 +12,7 @@
               th 資料登入時間
               th 負責營業所
           tbody
-            tr(v-for="row in responseData.rows", :class="isPositive(row.status)")
+            tr(v-for="row in responseData", :class="{ positive : isPositive(row.status) }")
               td {{ row.rowNum }}
               td {{ row.status }}
               td {{ row.time }}

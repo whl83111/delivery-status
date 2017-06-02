@@ -5,71 +5,95 @@ import json
 import datetime
 
 #東風
+DONGPOO_CUSTOMER_DATA_LINK = 'http://220.135.157.10:8088/goods_status'
+DONGPOO_DELIVERY_DETAILS_LINK = 'http://220.135.157.10:8088/goods_queryGoodsStatus'
+DONGPOO_ID_LENGTH = 12
 class DongPoo():
 	def __init__(self, deliveryId):
-		self.deliveryId = deliveryId
+		self.deliveryId = str(deliveryId)
+		self.handleDate = None
+		self.consigneeName = None
+		self.bookingDate = None
+		self.realCcPrice = None
+		self.details = list()
 
-	def getResponse(self):
-		pass
-
-
-def getDongPoo(deliveryId):
-	link = 'http://220.135.157.10:8088/goods_status'
-	postData = {'trackNo' : deliveryId}
-	response = rq.post(link, data = postData)
-	targetData = {}
-	if response.json() != []:
-		temp = response.json()[0]
-		link2 = 'http://220.135.157.10:8088/goods_queryGoodsStatus'
-		response2 = rq.post(link2, data = postData)
-		temp2 = response2.json()
-		targetData = {
-			'deliveryId' : deliveryId,
-			'handleDate' : temp['handleDate'], # 送達日期
-			'consigneeName' : temp['consigneeName'], # 收件人
-			'bookingDate' : datetime.datetime.strptime(temp['bookingDate'], '%Y%m%d').strftime('%Y/%m/%d'), # 資料日期
-			'realCcPrice' : temp['realCcPrice'], # 代收款
-		}
-		targetData['details'] = []
-		for data in temp2:
-			data_temp = {
-				'rowNum' : data['rowNum'],
-				'handleDate' : data['handleDate'], # 日期
-				'handleTime' : data['handleTime'], # 時間
-				'remark' : data['remark'] # 貨況
-			}
-			targetData['details'].append(data_temp)
-		targetData['expired'] = False
-	else:
-		targetData['deliveryId'] = deliveryId
-		targetData['expired'] = True
-	return targetData
-
-def getBlackCat(deliveryId):
-	link = 'https://www.t-cat.com.tw/Inquire/TraceDetail.aspx?BillID={}&ReturnUrl=Trace.aspx'.format(deliveryId)
-	response = rq.get(link)
-	# print(link)
-	soup = bs(response.text, 'lxml')
-	targetData = {'rows' : [], 'deliveryId' : deliveryId}
-	try:
-		rows = soup.select('table.tablelist')[0].select('tr')
-		for i in range(1, len(rows)):
-			j = 0
-			if i == 1:
-				j += 1
-			targetData['rows'].append({
-				'nowNum' : i,
-				'status' : rows[i].select('td')[j].text.strip(),
-				'time' : rows[i].select('td')[j + 1].text.strip(),
-				'location' : rows[i].select('td')[j + 2].text.strip()
+	def deliveryIdLengthIsCorrect(self):
+		if (len(self.deliveryId) == DONGPOO_ID_LENGTH) and (self.deliveryId.isdigit()):
+			return True
+	
+	def getCustomerData(self):
+		response = rq.post(DONGPOO_CUSTOMER_DATA_LINK, data={'trackNo': self.deliveryId})
+		if response.json() != []:
+			responseData = response.json()[0]
+			self.handleDate = responseData['handleDate']  # 送達日期
+			self.consigneeName = responseData['consigneeName']  # 收件人
+			self.bookingDate = datetime.datetime.strptime(
+				responseData['bookingDate'], '%Y%m%d').strftime('%Y/%m/%d')  # 資料日期
+			self.realCcPrice = responseData['realCcPrice']  # 代收款
+	
+	def getDetailsData(self):
+		response = rq.post(DONGPOO_DELIVERY_DETAILS_LINK,
+		                   data={'trackNo': self.deliveryId})
+		responseDatas = response.json()
+		for data in responseDatas:
+			self.details.append({
+				'rowNum': data['rowNum'],
+				'handleDate': data['handleDate'],  # 日期
+				'handleTime': data['handleTime'],  # 時間
+				'remark': data['remark']  # 貨況
 			})
-	except:
-		targetData['error'] = True
-	if targetData['rows'] == []:
-		targetData['expired'] = True
-	else:
-		targetData['expired'] = False
-	return targetData
+	
+	def getData(self):
+		try:
+			if self.deliveryIdLengthIsCorrect():
+				self.getCustomerData()
+				self.getDetailsData()
+				return self.__dict__ if (self.handleDate != None and
+									self.consigneeName != None and
+									self.bookingDate != None and
+									self.realCcPrice != None and
+									self.details != list()) else None
+		except:
+			return None
+
+
+# 黑貓
+BLACKCAT_LINK_TEMPLATE = 'https://www.t-cat.com.tw/Inquire/TraceDetail.aspx?BillID={}&ReturnUrl=Trace.aspx'
+BLACKCAT_ID_LENGTH = [10, 12]
+class BlackCat():
+	def __init__(self, deliveryId):
+		self.deliveryId = str(deliveryId)
+		self.responseData = list()
+
+	def deliveryIdLengthIsCorrect(self):
+		if (len(self.deliveryId) in BLACKCAT_ID_LENGTH) and (self.deliveryId.isdigit()):
+			return True
+
+	def getResponseData(self):
+		response = rq.get(BLACKCAT_LINK_TEMPLATE.format(self.deliveryId))
+		soup = bs(response.text, 'lxml')
+		try:
+			rows = soup.select('table.tablelist')[0].select('tr')
+			for rowIndex in range(1, len(rows)):
+				elementIndex = 0
+				if rowIndex == 1:
+					elementIndex += 1
+				self.responseData.append({
+					'rowNum': rowIndex,
+					'status': rows[rowIndex].select('td')[elementIndex].text.strip(),
+					'time': rows[rowIndex].select('td')[elementIndex + 1].text.strip(),
+					'location': rows[rowIndex].select('td')[elementIndex + 2].text.strip()
+				})
+		except IndexError:
+			pass
+
+	def getData(self):
+		try:
+			if self.deliveryIdLengthIsCorrect():
+				self.getResponseData()
+				return self.responseData if self.responseData != list() else None
+		except:
+			return None
 
 
 # 速力達
@@ -78,10 +102,7 @@ SKYLEADEREXPRESS_ID_LENGTH = 12
 class SkyLeaderExpress():
 	def __init__(self, deliveryId):
 		self.deliveryId = str(deliveryId)
-		self.responseData = {
-			'deliveryId': deliveryId,
-			'data': list()
-		}
+		self.responseData = list()
 	
 	def deliveryIdLengthIsCorrect(self):
 		if (len(self.deliveryId) == SKYLEADEREXPRESS_ID_LENGTH) and (self.deliveryId.isdigit()):
@@ -96,7 +117,7 @@ class SkyLeaderExpress():
 		responseDatas = [data.text.split('·') for data in responseTable[1:]]
 		if responseDeliveryId == self.deliveryId:
 			for data in responseDatas:
-				self.responseData['data'].append({
+				self.responseData.append({
 					'time': data[0],
 					'status': data[1]
 				})
@@ -108,12 +129,31 @@ class SkyLeaderExpress():
 		except:
 			pass
 		finally:
-			return self.responseData
+			return self.responseData if (self.responseData != list()) else None
+
+class GetDeliveryData():
+	def __init__(self, deliveryId):
+		self.deliveryId = deliveryId
+		self.skyLeaderExpress = SkyLeaderExpress(deliveryId)
+		self.dongPoo = DongPoo(deliveryId)
+		self.blackCat = BlackCat(deliveryId)
+	
+	def getDict(self):
+		return {
+			'deliveryId': self.deliveryId,
+			'data': {
+				'skyLeader': self.skyLeaderExpress.getData(),
+				'dongPoo': self.dongPoo.getData(),
+				'blackCat': self.blackCat.getData()
+			}
+		}
 
 if __name__ == '__main__':
-	# deliveryId = 900032521962
-	# print(getDongPoo(deliveryId))
-	# print(getBlackCat(deliveryId))
-	slid = 300003938454
-	print(SkyLeaderExpress(slid).getData())
-
+	# deliveryId = 900143300616
+	deliveryId = 900032521962
+	# print(DongPoo(deliveryId).getData())
+	# print(BlackCat(deliveryId).getData())
+	
+	# deliveryId = 300003938454
+	# print(SkyLeaderExpress(deliveryId).getData())
+	print(GetDeliveryData(deliveryId).getDict())

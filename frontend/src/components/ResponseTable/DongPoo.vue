@@ -4,7 +4,7 @@
       .header 東風
     .content
       .description
-        table.ts.celled.structured.table
+        table.ts.celled.table
           thead
             tr
               th 資料日期
@@ -17,7 +17,7 @@
               td {{ responseData.handleDate }}
               td {{ responseData.consigneeName }}
               td {{ responseData.realCcPrice }}
-        table.ts.celled.structured.table
+        table.ts.celled.selectable.table
           thead
             tr
               th #
@@ -25,7 +25,7 @@
               th 時間
               th 貨況
           tbody
-            tr(v-for="row in responseData.rows", :class="isPositive(row.remark)")
+            tr(v-for="row in responseData.details", :class="{ positive : isPositive(row.remark) }")
               td {{ row.rowNum }}
               td {{ row.handleDate }}
               td {{ row.handleTime }}

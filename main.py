@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, request, abort
-from getDeliveryData import getDongPoo, getBlackCat
+from getDeliveryData import GetDeliveryData
 import json
 
 class CustomFlask(Flask):
@@ -23,55 +23,26 @@ app.config.update(
 	SEND_FILE_MAX_AGE_DEFAULT = 1,
 )
 
-INDEX_TEMPLATE = 'index_new.html'
-# INDEX_TEMPLATE = 'index.html'
-
-STATIC_FOLDER = 'dist/static'
+INDEX_TEMPLATE = 'index.html'
 
 @app.route('/')
 def index():
 	return render_template(INDEX_TEMPLATE)
 
-@app.route('/getData/', methods = ['POST'])
-def getData():
-	if (not request.json) or (not 'deliveryId' in request.json):
-		abort(400)
-	else:
-		deliveryId = request.json['deliveryId']
-		DongPoo = getDongPoo(deliveryId)
-		BlackCat = getBlackCat(deliveryId)
-		return jsonify(deliveryId = deliveryId, DongPoo = DongPoo, BlackCat = BlackCat)
-
-TEST_DATA = [{
-	'delievryId': '111',
-	'DongPoo': 'DongPooRes111',
-	'BlackCat': 'BlackCatRes111'
-},
-{
-	'delievryId': '222',
-	'DongPoo': 'DongPooRes222',
-	'BlackCat': 'BlackCatRes222'
-}
-]
-
-@app.route('/testPOST/', methods = ['POST'])
-def testPOST():
-	if (not request.json) or (not 'deliveryId' in request.json):
-		abort(400)
-	else:
-		return jsonify(TEST_DATA)
-
 @app.route('/<int:deliveryId>', methods = ['POST'])
 def testAPI():
 	return jsonify(deliveryId = deliveryId)
 
-@app.route('/testPOSTMulti/', methods=['POST'])
+@app.route('/getData/', methods=['POST'])
 def testPOSTMulti():
 	if (not request.json) or (not 'deliveryId' in request.json):
 		abort(400)
 	else:
-		res = [dId.strip() for dId in request.json['deliveryId'].split(',')]
-		return jsonify(res)
+		deliveryIds = [dId.strip() for dId in request.json['deliveryId'].split(',')]
+		print(deliveryIds)
+		responseDatas = [GetDeliveryData(deliveryId).getDict() for deliveryId in deliveryIds]
+		print(responseDatas)
+		return jsonify(responseDatas)
 
 if __name__ == "__main__":
 	app.run(host = '127.0.0.1', port = 8000)
