@@ -36,7 +36,6 @@ export default {
         deliveryId: this.deliveryId
       })
         .then((response) => {
-          console.log(response.data)
           self.responseDatas = response.data
         })
         .catch((error) => {
