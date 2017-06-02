@@ -39,10 +39,10 @@ def getData():
 		abort(400)
 	else:
 		deliveryIds = [dId.strip() for dId in request.json['deliveryId'].split(',')]
-		print(deliveryIds)
+		# print(deliveryIds)
 		responseDatas = [GetDeliveryData(deliveryId).getDict() for deliveryId in deliveryIds]
-		print(responseDatas)
+		# print(responseDatas)
 		return jsonify(responseDatas)
 
 if __name__ == "__main__":
-	app.run(host = '127.0.0.1', port = 8000)
+	app.run(host = '127.0.0.1', port = 8000, debug=False)
